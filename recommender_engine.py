@@ -16,6 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 import difflib  # for finding close matches - fuzzy matching
 from sklearn.preprocessing import normalize # for normalizing vectors
+import joblib
 
 
 app = FastAPI()
@@ -71,12 +72,15 @@ svd = TruncatedSVD(n_components=200, random_state=42)
 # This reduces the feature vectors to a more manageable size while retaining most of the important information.
 
 feature_vectors_reduced = svd.fit_transform(feature_vectors)
+# save as joblib object
+joblib.dump(feature_vectors_reduced, "song_vectors_reduced.pkl")
 
 
 # normalizing the reduced feature vectors
 # this step ensures that the vectors have unit length,
 # This enables fast cosine similarity via dot product.
 X_norm = normalize(feature_vectors_reduced, norm="l2")
+
 
 # Compute the cosine similarity for one song against all songs - to avoid crashing memory
 # function to get song recommendations
